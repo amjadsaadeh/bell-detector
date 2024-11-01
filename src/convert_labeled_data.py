@@ -18,27 +18,28 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     result = {
-        'annotation_ids': list(),
-        'audio_paths': list(),
-        'file_ids': list(),
-        'starts': list(),
-        'ends': list(),
-        'labels': list()
+        'annotation_id': list(),
+        'audio_path': list(),
+        'file_id': list(),
+        'start': list(),
+        'end': list(),
+        'label': list()
     }
 
     for row in df.iterrows():
-        annotation_data = json.loads(row[1].label)
+        row = row[1]
+        annotation_data = json.loads(row.label)
 
         for annotation in annotation_data:
             for label in annotation['labels']:
-                result['labels'].append(label)
-                result['starts'].append(annotation['start'])
-                result['ends'].append(annotation['end'])
-                result['file_ids'].append(row.id)
-                result['audio_paths'].append(row.audio)
-                result['annotation_ids'].append(row.annotation_id)
+                result['label'].append(label)
+                result['start'].append(annotation['start'])
+                result['end'].append(annotation['end'])
+                result['file_id'].append(row.id)
+                result['audio_path'].append(row.audio)
+                result['annotation_id'].append(row.annotation_id)
     
-    return df.DataFrame(result)
+    return pd.DataFrame(result)
 
 
 if __name__ == '__main__':
