@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  convert_labeled_data:
+    cmd: python src/convert_labeled_data.py
+    deps:
+    - path: data/labeled_data.csv
+      hash: md5
+      md5: 434d28e3bd9701356756145832ac5a7d
+      size: 9392
+    - path: src/convert_labeled_data.py
+      hash: md5
+      md5: 6aaca710b02c324b3e6794c0ea060647
+      size: 1593
+    outs:
+    - path: data/annotation_per_row_data.csv
+      hash: md5
+      md5: 92886676f31830029e6d4fd9336edb5c
+      size: 5431

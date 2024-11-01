@@ -45,6 +45,8 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == '__main__':
     
     data_file_path = './data/labeled_data.csv'
+    target_file_path = './data/annotation_per_row_data.csv'
 
     df = pd.read_csv(data_file_path)
-    annotation_to_sample_per_row(df)
+    converted_df = annotation_to_sample_per_row(df)
+    converted_df.to_csv(target_file_path)

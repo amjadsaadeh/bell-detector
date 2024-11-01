@@ -1,0 +1,8 @@
+stages:
+  convert_labeled_data:
+    cmd: python src/convert_labeled_data.py
+    deps:
+    - data/labeled_data.csv
+    - src/convert_labeled_data.py
+    outs:
+    - data/annotation_per_row_data.csv
