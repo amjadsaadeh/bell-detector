@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/labeled_data.csv
       hash: md5
-      md5: 434d28e3bd9701356756145832ac5a7d
-      size: 9392
+      md5: 48058ba3760bb3365d35fc34a040799c
+      size: 11045
     - path: src/convert_labeled_data.py
       hash: md5
       md5: 6aaca710b02c324b3e6794c0ea060647
