@@ -36,7 +36,8 @@ def parse_args():
                        help='Directory to save recordings (default: recordings)')
     parser.add_argument('--threshold', type=int, default=1000)
     parser.add_argument('--duration', type=int, default=7)
-    parser.add_argument('--keep', type=int, default=5, help='Number of previous windows to keep in memory')
+    parser.add_argument('--keep-chunks', type=int, default=5, help='Number of previous windows to keep in memory')
+    parser.add_argument('--skip-chunks', type=int, default=10, help='Number of chunks to skip before starting to record')
     return parser.parse_args()
 
 # Modified main function
@@ -74,25 +75,46 @@ def main():
 
     
     # Create circular buffer for storing audio history
-    audio_buffer = collections.deque(maxlen=args.keep)
+    audio_buffer = collections.deque(maxlen=args.skip_chunks)
 
     print(f"Monitoring audio at 16kHz... Saving to {save_dir}/")
 
+    i = 0 # Counter for printing mean amplitude from time to time
+    skip_chunks = args.skip_chunks
     try:
         while True:
-            data = stream.read(CHUNK)
-            audio_buffer.append(data)
-            
-            audio_data = np.frombuffer(data, dtype=np.int16)
-            mean_amplitude = np.mean(np.abs(audio_data))
-            print(f'Mean amplitude: {mean_amplitude}')
-            if mean_amplitude > args.threshold:
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                filename = save_dir / f"recording_{timestamp}.wav"
-                print(f"[{timestamp}] Threshold exceeded! Recording to {filename}")
-                save_audio(audio_buffer, stream, filename)
+            try:
+                data = stream.read(CHUNK)
+
+                if skip_chunks > 0:
+                    skip_chunks -= 1
+                    continue
+
+                audio_buffer.append(data)
                 
-            time.sleep(0.1)
+                audio_data = np.frombuffer(data, dtype=np.int16)
+                mean_amplitude = np.mean(np.abs(audio_data))
+                if i % 100 == 0:
+                    print(f'Still running, current mean amplitude: {mean_amplitude}')
+                    i = 0
+                if mean_amplitude > args.threshold:
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    filename = save_dir / f"recording_{timestamp}.wav"
+                    print(f"[{timestamp}] Threshold exceeded with {mean_amplitude}! Recording to {filename}")
+                    save_audio(audio_buffer, stream, filename)
+                i += 1
+
+            except OSError:
+                print("OSError: Buffer overflow, restart")
+                stream = p.open(
+                    format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK,
+                    input_device_index=device_idx
+                )
+                skip_chunks = args.skip_chunks
 
     except KeyboardInterrupt:
         print("\nStopping...")
