@@ -6,3 +6,9 @@ stages:
     - src/convert_labeled_data.py
     outs:
     - data/annotation_per_row_data.csv
+  fetch_labeled_data:
+    cmd: ./src/fetch_data.sh
+    deps:
+    - src/fetch_data.sh
+    outs:
+    - data/labeled_data.csv

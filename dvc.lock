@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/labeled_data.csv
       hash: md5
-      md5: 2fb4f320b3eedb204bec6bee30eea331
-      size: 11040
+      md5: 29f6f70588e1e2bcde3d7835d85dbe95
+      size: 153638
     - path: src/convert_labeled_data.py
       hash: md5
       md5: 6aaca710b02c324b3e6794c0ea060647
@@ -14,5 +14,18 @@ stages:
     outs:
     - path: data/annotation_per_row_data.csv
       hash: md5
-      md5: 3bdefb324fef024615d7c3ac2ed7fded
-      size: 6659
+      md5: 02b0f956ef84921664905bb6b683638e
+      size: 78166
+  fetch_labeled_data:
+    cmd: ./src/fetch_data.sh
+    deps:
+    - path: src/fetch_data.sh
+      hash: md5
+      md5: b031d3969b674c3d84a4d78d08ca18b5
+      size: 239
+      isexec: true
+    outs:
+    - path: data/labeled_data.csv
+      hash: md5
+      md5: 29f6f70588e1e2bcde3d7835d85dbe95
+      size: 153638
