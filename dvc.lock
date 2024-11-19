@@ -29,3 +29,21 @@ stages:
       hash: md5
       md5: 29f6f70588e1e2bcde3d7835d85dbe95
       size: 153638
+  download_audio:
+    cmd: python ./src/download_audio.py --target-dir data/audio --annotations-file
+      data/annotation_per_row_data.csv
+    deps:
+    - path: data/annotation_per_row_data.csv
+      hash: md5
+      md5: 02b0f956ef84921664905bb6b683638e
+      size: 78166
+    - path: src/download_audio.py
+      hash: md5
+      md5: e78334358fef181c6b650759ac1149b8
+      size: 1276
+    outs:
+    - path: data/audio
+      hash: md5
+      md5: cded3d5da0c54a494e3891d1a3433648.dir
+      size: 295961420
+      nfiles: 650

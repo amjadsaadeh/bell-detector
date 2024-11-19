@@ -12,3 +12,11 @@ stages:
     - src/fetch_data.sh
     outs:
     - data/labeled_data.csv
+  download_audio:
+    cmd: python ./src/download_audio.py --target-dir data/audio --annotations-file
+      data/annotation_per_row_data.csv
+    deps:
+    - data/annotation_per_row_data.csv
+    - src/download_audio.py
+    outs:
+    - data/audio
