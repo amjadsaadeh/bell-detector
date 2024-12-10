@@ -9,11 +9,11 @@ if __name__ == '__main__':
     # Load data
     df = pd.read_csv('data/annotation_per_row_data.csv')
 
-    samples_per_label = df.groupby('label').size().to_dict()
+    samples_per_label = df.groupby('label').size()
 
     # Calculate imbalance between labels
-    max_samples = max(samples_per_label.values())
-    min_samples = min(samples_per_label.values())
+    max_samples = samples_per_label.max()
+    min_samples = samples_per_label.min()
     imbalance_ratio = max_samples / min_samples if min_samples > 0 else None
 
     # Calculate data quality metrics
@@ -28,5 +28,4 @@ if __name__ == '__main__':
     with open('data/data_quality/general.json', 'w') as f:
         json.dump(data_quality, f, indent=4)
     
-    with open('data/data_quality/samples_per_label.json', 'w') as f:
-        json.dump(samples_per_label, f, indent=4)
+    samples_per_label.to_csv('data/data_quality/samples_per_label.csv')

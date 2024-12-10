@@ -27,7 +27,15 @@ stages:
     - src/extract_data_quality.py
     outs:
     - data/data_quality/general.json
-    - data/data_quality/samples_per_label.json
+    - data/data_quality/samples_per_label.csv
 
 metrics:
   - data/data_quality/general.json
+
+plots:
+  - number of samples vs label:
+      template: bar_horizontal_sorted
+      x: "0"
+      y:
+        data/data_quality/samples_per_label.csv: label
+

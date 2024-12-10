@@ -56,14 +56,14 @@ stages:
       size: 78166
     - path: src/extract_data_quality.py
       hash: md5
-      md5: efa72f27b135931ae76921c108275433
-      size: 1006
+      md5: 1cf2554e4661332deea6d6bd7ac4b261
+      size: 933
     outs:
     - path: data/data_quality/general.json
       hash: md5
       md5: fa6f693c1f66f2bc53d7c21f6af09d6e
       size: 118
-    - path: data/data_quality/samples_per_label.json
+    - path: data/data_quality/samples_per_label.csv
       hash: md5
-      md5: 818f1a050b4c980d58d66037a844b7d7
-      size: 101
+      md5: d5bf9d0c71d29e3ef8e7b90c4a176fc3
+      size: 75
