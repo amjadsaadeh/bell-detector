@@ -20,3 +20,10 @@ stages:
     - src/download_audio.py
     outs:
     - data/audio
+  extract_data_quality:
+    cmd: python ./src/extract_data_quality.py
+    deps:
+    - data/annotation_per_row_data.csv
+    - src/extract_data_quality.py
+    outs:
+    - data/data_quality.json
