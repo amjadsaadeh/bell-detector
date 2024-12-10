@@ -26,4 +26,8 @@ stages:
     - data/annotation_per_row_data.csv
     - src/extract_data_quality.py
     outs:
-    - data/data_quality.json
+    - data/data_quality/general.json
+    - data/data_quality/samples_per_label.json
+
+metrics:
+  - data/data_quality/general.json

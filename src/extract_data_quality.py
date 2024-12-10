@@ -21,10 +21,12 @@ if __name__ == '__main__':
         'total_samples': len(df),
         'total_files': len(df.file_id.unique()),
         'total_labels': len(df.label.unique()),
-        'samples_per_label': samples_per_label,
         'imbalance_ratio': imbalance_ratio
     }
 
     # Save data quality metrics
-    with open('data/data_quality.json', 'w') as f:
+    with open('data/data_quality/general.json', 'w') as f:
         json.dump(data_quality, f, indent=4)
+    
+    with open('data/data_quality/samples_per_label.json', 'w') as f:
+        json.dump(samples_per_label, f, indent=4)
