@@ -47,3 +47,19 @@ stages:
       md5: cded3d5da0c54a494e3891d1a3433648.dir
       size: 295961420
       nfiles: 650
+  extract_data_quality:
+    cmd: python ./src/extract_data_quality.py
+    deps:
+    - path: data/annotation_per_row_data.csv
+      hash: md5
+      md5: 02b0f956ef84921664905bb6b683638e
+      size: 78166
+    - path: src/extract_data_quality.py
+      hash: md5
+      md5: 7f504bc82dcd44f8ba2c54f3a5cb2f10
+      size: 922
+    outs:
+    - path: data/data_quality.json
+      hash: md5
+      md5: 9bc702251382bc703517912d2558c356
+      size: 266
