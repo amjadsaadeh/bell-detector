@@ -6,7 +6,6 @@
 	"recommendations": [
 		"njpwerner.autodocstring",
 		"iterative.dvc",
-		"ms-vscode.cmake-tools",
 		"mkhl.direnv",
 		"ms-python.python",
 		"ms-toolsai.jupyter",
