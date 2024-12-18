@@ -1,3 +1,4 @@
 .python-version
 *.pyc
 .envrc
+dvc_remote
