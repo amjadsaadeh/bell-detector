@@ -1,6 +1,8 @@
 import pandas as pd
 import dvc.api
 
+OLD_DATA_PATH = '/data/local-files/?d=bell_detector_data/raw_data/'
+
 if __name__ == '__main__':
     params = dvc.api.params_show()
     chunk_size = params['chunk_size']
@@ -10,7 +12,7 @@ if __name__ == '__main__':
     
     # Create chunks using list comprehension instead of iterative append
     chunks = [
-        row.to_dict() | {'start': chunk_start / 1000, 'end': (chunk_start + chunk_size) / 1000}
+        row.to_dict() | {'start': chunk_start, 'end': (chunk_start + chunk_size)}
         for _, row in annotated_data.iterrows()
         for chunk_start in range(
             int(row['start'] * 1000),  # convert to ms
@@ -21,4 +23,5 @@ if __name__ == '__main__':
     
     # Create DataFrame from list of dictionaries
     result = pd.DataFrame(chunks)
+    result.audio_path = result.audio_path.str.replace(OLD_DATA_PATH, '')
     result.to_csv('./data/chunked_data.csv', index=False)

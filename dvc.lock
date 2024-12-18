@@ -76,8 +76,8 @@ stages:
       size: 78786
     - path: src/cut_in_chunks.py
       hash: md5
-      md5: 8b6aeb1dcf9ec860959995efbd847011
-      size: 815
+      md5: 6e56d9cfd889572c8644e5f056935ef3
+      size: 943
     params:
       params.yaml:
         chunk_overlap: 30
@@ -85,5 +85,5 @@ stages:
     outs:
     - path: data/chunked_data.csv
       hash: md5
-      md5: effc1df4ba313086f62c7645199093c6
-      size: 31456226
+      md5: b8b140ffbd3ae8188a73f27cfa0293f4
+      size: 17816959

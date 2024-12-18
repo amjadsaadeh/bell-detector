@@ -38,6 +38,15 @@ stages:
     - chunk_overlap
     outs:
     - data/chunked_data.csv
+  extract_features:
+    cmd: python src/extract_mfcc_features.py
+    deps:
+    - data/chunked_data.csv
+    - src/extract_mfcc_features.py
+    params:
+    - feature_extraction
+    outs:
+    - ./data/chunked_mffc_data.parquet
 
 metrics:
   - data/data_quality/general.json
