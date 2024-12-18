@@ -28,6 +28,16 @@ stages:
     outs:
     - data/data_quality/general.json
     - data/data_quality/samples_per_label.csv
+  cut_in_chunks:
+    cmd: python src/cut_in_chunks.py
+    deps:
+    - data/annotation_per_row_data.csv
+    - src/cut_in_chunks.py
+    params:
+    - chunk_size
+    - chunk_overlap
+    outs:
+    - data/chunked_data.csv
 
 metrics:
   - data/data_quality/general.json
@@ -39,3 +49,5 @@ plots:
       y:
         data/data_quality/samples_per_label.csv: label
 
+params:
+  - params.yaml
