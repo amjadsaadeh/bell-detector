@@ -67,3 +67,23 @@ stages:
       hash: md5
       md5: ecd20cba34156a2e023c684d7a914e02
       size: 75
+  cut_in_chunks:
+    cmd: python src/cut_in_chunks.py
+    deps:
+    - path: data/annotation_per_row_data.csv
+      hash: md5
+      md5: 836c21572751ec2944967f222a8fd885
+      size: 78786
+    - path: src/cut_in_chunks.py
+      hash: md5
+      md5: 8b6aeb1dcf9ec860959995efbd847011
+      size: 815
+    params:
+      params.yaml:
+        chunk_overlap: 30
+        chunk_size: 100
+    outs:
+    - path: data/chunked_data.csv
+      hash: md5
+      md5: effc1df4ba313086f62c7645199093c6
+      size: 31456226
