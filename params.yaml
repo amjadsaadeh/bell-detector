@@ -4,3 +4,12 @@ chunk_overlap: 30 #ms
 feature_extraction:
   n_mfcc: 13
   n_fft: 512
+
+training:
+  test_size: 0.2
+
+model:
+  n_estimators: 10
+  max_depth: 6
+  learning_rate: 0.1
+  random_state: 42
