@@ -18,12 +18,12 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     result = {
-        'annotation_id': list(),
-        'audio_path': list(),
-        'file_id': list(),
-        'start': list(),
-        'end': list(),
-        'label': list()
+        "annotation_id": list(),
+        "audio_path": list(),
+        "file_id": list(),
+        "start": list(),
+        "end": list(),
+        "label": list(),
     }
 
     for row in df.iterrows():
@@ -31,21 +31,21 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
         annotation_data = json.loads(row.label)
 
         for annotation in annotation_data:
-            for label in annotation['labels']:
-                result['label'].append(label)
-                result['start'].append(annotation['start'])
-                result['end'].append(annotation['end'])
-                result['file_id'].append(row.id)
-                result['audio_path'].append(row.audio)
-                result['annotation_id'].append(row.annotation_id)
-    
+            for label in annotation["labels"]:
+                result["label"].append(label)
+                result["start"].append(annotation["start"])
+                result["end"].append(annotation["end"])
+                result["file_id"].append(row.id)
+                result["audio_path"].append(row.audio)
+                result["annotation_id"].append(row.annotation_id)
+
     return pd.DataFrame(result)
 
 
-if __name__ == '__main__':
-    
-    data_file_path = './data/labeled_data.csv'
-    target_file_path = './data/annotation_per_row_data.csv'
+if __name__ == "__main__":
+
+    data_file_path = "./data/labeled_data.csv"
+    target_file_path = "./data/annotation_per_row_data.csv"
 
     df = pd.read_csv(data_file_path)
     converted_df = annotation_to_sample_per_row(df)
