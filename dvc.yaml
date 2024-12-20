@@ -26,7 +26,7 @@ stages:
     - data/annotation_per_row_data.csv
     - src/extract_data_quality.py
     outs:
-    - data/data_quality/general.json
+    - data/data_quality/sample_based_quality.json
     - data/data_quality/samples_per_label.csv
   cut_in_chunks:
     cmd: python src/cut_in_chunks.py
@@ -38,18 +38,27 @@ stages:
     - chunk_overlap
     outs:
     - data/chunked_data.csv
+  balance_data_set:
+    cmd: python src/balance_dataset.py
+    deps:
+    - data/chunked_data.csv
+    - src/balance_dataset.py
+    outs:
+    - data/balanced_data.csv
   extract_features:
     cmd: python src/extract_mfcc_features.py
     deps:
-    - data/chunked_data.csv
+    - data/balanced_data.csv
+    - data/audio
     - src/extract_mfcc_features.py
     params:
     - feature_extraction
     outs:
-    - ./data/chunked_mffc_data.parquet
+    - ./data/mffc_data.h5
 
 metrics:
-  - data/data_quality/general.json
+  - data/data_quality/sample_based_quality.json
+  - data/data_quality/chunk_balanced_quality.json
 
 plots:
   - number of samples vs label:
