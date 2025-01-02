@@ -68,6 +68,7 @@ stages:
 metrics:
 - data/data_quality/sample_based_quality.json
 - data/data_quality/chunk_balanced_quality.json
+- dvclive/metrics.json
 plots:
 - number of samples vs label:
     template: bar_horizontal_sorted
