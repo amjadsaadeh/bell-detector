@@ -48,7 +48,10 @@ def main():
         y_pred = model.predict(X_test)
         y_pred_decoded = le.inverse_transform(y_pred)
         y_test_decoded = le.inverse_transform(y_test)
+        report = classification_report(y_test, y_pred, output_dict=True)
+
         live.log_sklearn_plot("confusion_matrix", y_test_decoded, y_pred_decoded)
+        live.log_metric("f1_score", report["weighted avg"]["f1-score"])
         # Save model
         model_path = Path("./models/xgboost_model.json")
         model_path.parent.mkdir(exist_ok=True)
