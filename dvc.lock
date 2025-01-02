@@ -127,14 +127,14 @@ stages:
     outs:
     - path: ./data/mffc_data.h5
       hash: md5
-      md5: fd713c54db585e40e78ffeab59506e0c
+      md5: 3e203d372c59a850b6f0e786f565c216
       size: 3219848
   train_model:
     cmd: python src/train_xgboost.py
     deps:
     - path: data/mffc_data.h5
       hash: md5
-      md5: fd713c54db585e40e78ffeab59506e0c
+      md5: 3e203d372c59a850b6f0e786f565c216
       size: 3219848
     - path: src/train_xgboost.py
       hash: md5
