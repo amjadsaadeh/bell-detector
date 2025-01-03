@@ -76,14 +76,5 @@ plots:
     y:
       data/data_quality/samples_per_label.csv: label
 
-- dvclive/plots/metrics:
-    x: step
-- dvclive/plots/sklearn/confusion_matrix.json:
-    template: confusion
-    x: actual
-    y: predicted
-    title: Confusion Matrix
-    x_label: True Label
-    y_label: Predicted Label
 params:
 - params.yaml

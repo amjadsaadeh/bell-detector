@@ -2,4 +2,3 @@
 *.pyc
 .envrc
 dvc_remote
-/dvclive
