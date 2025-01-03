@@ -4,8 +4,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import xgboost as xgb
-import json
-import dvc.api
+import yaml
 from dvclive.xgb import DVCLiveCallback
 from dvclive import Live
 from sklearn.preprocessing import LabelEncoder
@@ -25,7 +24,10 @@ def prepare_data(df):
 
 
 def main():
-    params = dvc.api.params_show()
+
+    with open("params.yaml", "r") as file:
+        params = yaml.safe_load(file)
+        
     model_params = params["model"]
 
     # Load data
