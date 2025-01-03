@@ -143,12 +143,12 @@ stages:
     params:
       params.yaml:
         model:
-          n_estimators: 10
+          n_estimators: 5
           max_depth: 6
           learning_rate: 0.1
           random_state: 42
     outs:
     - path: models/xgboost_model.json
       hash: md5
-      md5: 753e39e66a3a223d40b671b4894ace14
-      size: 52900
+      md5: aca2a7c70a22f98d07047c3f78f2275f
+      size: 26405
