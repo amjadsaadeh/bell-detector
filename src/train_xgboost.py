@@ -54,6 +54,8 @@ def main():
 
         live.log_sklearn_plot("confusion_matrix", y_test_decoded, y_pred_decoded)
         live.log_metric("f1_score", report["weighted avg"]["f1-score"])
+        live.log_metric("recall", report["weighted avg"]["recall"])
+        live.log_metric("precision", report["weighted avg"]["precision"])
         # Save model
         model_path = Path("./models/xgboost_model.json")
         model_path.parent.mkdir(exist_ok=True)
