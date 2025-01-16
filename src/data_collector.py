@@ -7,10 +7,12 @@ import time
 import argparse
 import os
 from pathlib import Path
+import xgboost as xgb
+import librosa
 
 # Modified parameters for Pi Zero W
 RATE = 16000
-WINDOW_SIZE = 0.2  # Increase to 200ms to reduce CPU load
+WINDOW_SIZE = 0.1
 CHANNELS = 1
 FORMAT = pyaudio.paInt16  # Use 16-bit instead of float32 to reduce memory
 CHUNK = int(RATE * WINDOW_SIZE)
@@ -42,7 +44,7 @@ def parse_args():
         default="recordings",
         help="Directory to save recordings (default: recordings)",
     )
-    parser.add_argument("--threshold", type=int, default=1000)
+    parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold of the model between 0 and 1")
     parser.add_argument("--duration", type=int, default=7)
     parser.add_argument(
         "--keep-chunks",
@@ -55,6 +57,12 @@ def parse_args():
         type=int,
         default=10,
         help="Number of chunks to skip before starting to record",
+    )
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        required=True,
+        help="Path to the XGBoost model file",
     )
     return parser.parse_args()
 
@@ -94,13 +102,27 @@ def main():
         input_device_index=device_idx,
     )
 
+    # Load XGBoost model from JSON file
+
+    model_path = args.model_path
+    if not os.path.exists(model_path):
+        print(f"Model file not found at {model_path}")
+        return
+
+    model = xgb.Booster()
+    model.load_model(model_path)
+    print(f"Loaded XGBoost model from {model_path}")
+
     # Create circular buffer for storing audio history
-    audio_buffer = collections.deque(maxlen=args.skip_chunks)
+    audio_buffer = collections.deque(maxlen=args.keep_chunks)
 
     print(f"Monitoring audio at 16kHz... Saving to {save_dir}/")
 
     i = 0  # Counter for printing mean amplitude from time to time
     skip_chunks = args.skip_chunks
+    n_mfcc = 13
+    n_fft = 512
+    chunk_rotation_idx = 0
     try:
         while True:
             try:
@@ -112,19 +134,38 @@ def main():
 
                 audio_buffer.append(data)
 
+                # Only process every 3rd chunk to reduce CPU usage
+                if chunk_rotation_idx % 3 == 0:
+                    chunk_rotation_idx = 1
+                    continue
+                chunk_rotation_idx += 1
+
                 audio_data = np.frombuffer(data, dtype=np.int16)
-                mean_amplitude = np.mean(np.abs(audio_data))
-                if i % 100 == 0:
-                    print(f"Still running, current mean amplitude: {mean_amplitude}")
-                    i = 0
-                if mean_amplitude > args.threshold:
+                audio_data = np.float32(audio_data)
+                mfccs = librosa.feature.mfcc(
+                    y=audio_data, sr=RATE, n_mfcc=n_mfcc, n_fft=n_fft
+                )
+                X = mfccs.flatten()
+                X = xgb.DMatrix(X.reshape((1, X.shape[0])))
+
+                y_pred = model.predict(X)
+                if y_pred[0] > args.threshold:
                     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                     filename = save_dir / f"recording_{timestamp}.wav"
-                    print(
-                        f"[{timestamp}] Threshold exceeded with {mean_amplitude}! Recording to {filename}"
-                    )
+                    print(f"[{timestamp}] Threshold exceeded with {y_pred}! Recording to {filename}")
                     save_audio(audio_buffer, stream, filename)
-                i += 1
+                # mean_amplitude = np.mean(np.abs(audio_data))
+                # if i % 100 == 0:
+                #     print(f"Still running, current mean amplitude: {mean_amplitude}")
+                #     i = 0
+                # if mean_amplitude > args.threshold:
+                #     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                #     filename = save_dir / f"recording_{timestamp}.wav"
+                #     print(
+                #         f"[{timestamp}] Threshold exceeded with {mean_amplitude}! Recording to {filename}"
+                #     )
+                #     save_audio(audio_buffer, stream, filename)
+                # i += 1
 
             except OSError:
                 print("OSError: Buffer overflow, restart")
