@@ -38,27 +38,19 @@ stages:
     outs:
     - ./data/mffc_data
 
-  cut_in_chunks:
-    cmd: python src/cut_in_chunks.py
+  draw_data:
+    cmd: python src/draw_data.py
     deps:
     - data/annotation_per_row_data.csv
-    - src/cut_in_chunks.py
-    params:
-    - chunk_size
-    - chunk_overlap
-    outs:
-    - data/chunked_data.csv
-  balance_data_set:
-    cmd: python src/balance_dataset.py
-    deps:
-    - data/chunked_data.csv
+    - data/mffc_data
     - src/balance_dataset.py
     outs:
-    - data/balanced_data.csv
+    - data/balanced_data.h5
+
   train_model:
     cmd: python src/train_xgboost.py
     deps:
-    - data/mffc_data.h5
+    - data/balanced_data.h5
     - src/train_xgboost.py
     params:
     - model

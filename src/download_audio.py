@@ -37,12 +37,12 @@ if __name__ == "__main__":
     for i, row in tqdm.tqdm(
         data.iterrows(), desc="Downloading audio files", total=len(data.index)
     ):
-        audio_file_target_path = target_dir / row["audio_path"].split("/")[-1]
+        audio_file_target_path = target_dir / row["remote_audio_path"].split("/")[-1]
 
         if audio_file_target_path.exists():
             continue
 
-        url = f'{os.getenv("LABEL_STUDIO_URL")}{row["audio_path"]}'
+        url = f'{os.getenv("LABEL_STUDIO_URL")}{row["remote_audio_path"]}'
         response = requests.get(
             url, headers={"Authorization": f'Token {os.getenv("API_KEY")}'}
         )

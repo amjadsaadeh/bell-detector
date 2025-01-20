@@ -7,6 +7,9 @@ import pandas as pd
 import json
 
 
+OLD_DATA_PATH = "/data/local-files/?d=bell_detector_data/raw_data/"
+
+
 def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
     """Coverts a DataFrame with soundfile per row into an annotation per row format.
 
@@ -19,11 +22,12 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
 
     result = {
         "annotation_id": list(),
-        "audio_path": list(),
         "file_id": list(),
         "start": list(),
         "end": list(),
         "label": list(),
+        "audio_file_name": list(),
+        "remote_audio_path": list()
     }
 
     for row in df.iterrows():
@@ -36,7 +40,8 @@ def annotation_to_sample_per_row(df: pd.DataFrame) -> pd.DataFrame:
                 result["start"].append(annotation["start"])
                 result["end"].append(annotation["end"])
                 result["file_id"].append(row.id)
-                result["audio_path"].append(row.audio)
+                result["remote_audio_path"].append(row.audio)
+                result["audio_file_name"].append(row.audio.replace(OLD_DATA_PATH, ""))
                 result["annotation_id"].append(row.annotation_id)
 
     return pd.DataFrame(result)
