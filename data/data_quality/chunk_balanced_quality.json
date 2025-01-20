@@ -1,6 +1,6 @@
 {
-    "total_samples": 7414,
-    "total_files": 626,
+    "total_samples": 7238,
+    "total_files": 611,
     "total_labels": 4,
-    "imbalance_ratio": 6.492119089316987
+    "imbalance_ratio": 6.4625
 }

@@ -1,4 +1,4 @@
-chunk_size: 100 # ms
+chunk_size: 200 # ms
 chunk_overlap: 30 #ms
 
 feature_extraction:

@@ -76,24 +76,24 @@ stages:
       size: 78085
     - path: src/cut_in_chunks.py
       hash: md5
-      md5: 4601a69fd30c88587b1c9a9624d4ec53
-      size: 936
+      md5: 351f5095b6f87abbd640c25a9640420b
+      size: 994
     params:
       params.yaml:
         chunk_overlap: 30
-        chunk_size: 100
+        chunk_size: 200
     outs:
     - path: data/chunked_data.csv
       hash: md5
-      md5: 52de44855cba91b5a14ef0a531b5af8f
-      size: 17265152
+      md5: 208b05c400ac9f50d541a1f05eb40d53
+      size: 17128119
   balance_data_set:
     cmd: python src/balance_dataset.py
     deps:
     - path: data/chunked_data.csv
       hash: md5
-      md5: 52de44855cba91b5a14ef0a531b5af8f
-      size: 17265152
+      md5: 208b05c400ac9f50d541a1f05eb40d53
+      size: 17128119
     - path: src/balance_dataset.py
       hash: md5
       md5: f40146df2cfbe074a4402a8d98c95f81
@@ -101,8 +101,8 @@ stages:
     outs:
     - path: data/balanced_data.csv
       hash: md5
-      md5: 1f0e7f2a46f70f379e2fc73a89413634
-      size: 486539
+      md5: 7f431ecef78783885462ab82a0a0c919
+      size: 474938
   extract_features:
     cmd: python src/extract_mfcc_features.py
     deps:
@@ -113,8 +113,8 @@ stages:
       nfiles: 644
     - path: data/balanced_data.csv
       hash: md5
-      md5: 1f0e7f2a46f70f379e2fc73a89413634
-      size: 486539
+      md5: 7f431ecef78783885462ab82a0a0c919
+      size: 474938
     - path: src/extract_mfcc_features.py
       hash: md5
       md5: 7425ab819e5a68ba240f6909113fede2
@@ -127,15 +127,15 @@ stages:
     outs:
     - path: ./data/mffc_data.h5
       hash: md5
-      md5: 7e718f5c3a370643ccbf45baf53f895c
-      size: 3219848
+      md5: c759c50768d13b8721d50baa68e8c4ff
+      size: 4297976
   train_model:
     cmd: python src/train_xgboost.py
     deps:
     - path: data/mffc_data.h5
       hash: md5
-      md5: 7e718f5c3a370643ccbf45baf53f895c
-      size: 3219848
+      md5: c759c50768d13b8721d50baa68e8c4ff
+      size: 4297976
     - path: src/train_xgboost.py
       hash: md5
       md5: b08717ecab8401bd69bb4d796c5c89b7
@@ -150,5 +150,5 @@ stages:
     outs:
     - path: models/xgboost_model.json
       hash: md5
-      md5: aca2a7c70a22f98d07047c3f78f2275f
-      size: 26405
+      md5: bbe04466a26d05534ebf70d402768673
+      size: 25120

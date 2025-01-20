@@ -1,10 +1,14 @@
 import pandas as pd
-import dvc.api
+import yaml
 
 OLD_DATA_PATH = "/data/local-files/?d=bell_detector_data/raw_data/"
 
 if __name__ == "__main__":
-    params = dvc.api.params_show()
+
+    
+    with open("params.yaml", "r") as file:
+        params = yaml.safe_load(file)
+        
     chunk_size = params["chunk_size"]
     chunk_overlap = params["chunk_overlap"]
 
