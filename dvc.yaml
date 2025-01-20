@@ -28,6 +28,16 @@ stages:
     outs:
     - data/data_quality/sample_based_quality.json
     - data/data_quality/samples_per_label.csv
+  extract_features:
+    cmd: python src/extract_mfcc_features.py
+    deps:
+    - data/audio
+    - src/extract_mfcc_features.py
+    params:
+    - feature_extraction
+    outs:
+    - ./data/mffc_data
+
   cut_in_chunks:
     cmd: python src/cut_in_chunks.py
     deps:
@@ -45,16 +55,6 @@ stages:
     - src/balance_dataset.py
     outs:
     - data/balanced_data.csv
-  extract_features:
-    cmd: python src/extract_mfcc_features.py
-    deps:
-    - data/balanced_data.csv
-    - data/audio
-    - src/extract_mfcc_features.py
-    params:
-    - feature_extraction
-    outs:
-    - ./data/mffc_data.h5
   train_model:
     cmd: python src/train_xgboost.py
     deps:
