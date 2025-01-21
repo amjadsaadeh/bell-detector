@@ -1,5 +1,6 @@
 chunk_size: 200 # ms
 chunk_overlap: 30 #ms
+inbalance_ratio: 1.0 # How much more background samples should be drawn
 
 feature_extraction:
   n_mfcc: 13

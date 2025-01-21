@@ -5,8 +5,42 @@ This script is to draw the data from the bigger dataset. It also takes care abou
 import json
 import pandas as pd
 import yaml
+import numpy as np
+from pathlib import Path
 from dataqualityutils import get_data_quality_metrics
 
+
+MFCC_FEATURES_FILE_BASE = Path('./data/mfcc_data')
+SAMPLING_RATE = 16000
+
+def get_mfcc_features(start: int,  end: int, duration: int, audio_file_name: str) -> np.ndarray:
+    """Reads out the MFCC features from the file and cut them according to start and end.
+
+    Args:
+        start (int): start in ms
+        end (int): end in ms
+        duration (int): duration of the orifinal sound file in s (otherwise I didn't find a proper way to deduce the number of mel samples)
+        audio_file_name (str): file to read the mfcc features from
+
+    Returns:
+        np.ndarray: mfcc features interval according to start and end
+    """
+
+    mfcc_file_path = MFCC_FEATURES_FILE_BASE / audio_file_name.replace('.wav', '.npy')
+    mfccs = np.load(mfcc_file_path)
+    
+    # Calculate the start and end sample
+    mel_coeffs_per_scond = mfccs.shape[1] / duration
+
+    start_sample = int(mel_coeffs_per_scond * (start / 1000))
+    end_sample = int(mel_coeffs_per_scond * (end / 1000))
+
+    print(start_sample, end_sample, mfccs.shape, start/1000, end/1000)
+
+    res = mfccs[:, start_sample:end_sample]
+    print(res.shape)
+
+    return res
 
 if __name__ == "__main__":
 
@@ -16,10 +50,6 @@ if __name__ == "__main__":
     # Read the dataset
     df = pd.read_csv("./data/annotation_per_row_data.csv")
 
-    # Split into background and non-background samples
-    background_samples = df[df["label"] == "background"]
-    non_background_samples = df[df["label"] != "background"]
-
     # Cut in chunks
     chunk_size = params["chunk_size"]
     chunk_overlap = params["chunk_overlap"]
@@ -28,7 +58,7 @@ if __name__ == "__main__":
 
     # Create chunks using list comprehension instead of iterative append
     chunks = [
-        row.to_dict() | {"start": chunk_start, "end": (chunk_start + chunk_size)}
+        row.to_dict() | {"chunk_start": chunk_start, "chunk_end": (chunk_start + chunk_size)}
         for _, row in annotated_data.iterrows()
         for chunk_start in range(
             int(row["start"] * 1000),  # convert to ms
@@ -36,14 +66,17 @@ if __name__ == "__main__":
             chunk_overlap,
         )
     ]
+    chunks = pd.DataFrame(chunks)
+    
+    # Split into background and non-background samples
+    background_samples = chunks[chunks["label"] == "background"]
 
-    # Create DataFrame from list of dictionaries
-    result = pd.DataFrame(chunks)
-    result.to_csv("./data/chunked_data.csv", index=False)
+    # TODO try imputations
+    non_background_samples = chunks[chunks["label"] != "background"]
 
     # Randomly sample from background class to match minority class size
     balanced_background = background_samples.sample(
-        n=len(non_background_samples), random_state=42
+        n=int(len(non_background_samples) * params['inbalance_ratio']), random_state=42
     )
 
     # Combine balanced datasets
@@ -51,6 +84,19 @@ if __name__ == "__main__":
 
     # Shuffle the dataset
     balanced_df = balanced_df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    sample_rate = 16000
+    n_fft = params["feature_extraction"]["n_fft"]
+    # Add MFCC features column
+    balanced_df['mfcc_features'] = balanced_df.apply(
+        lambda row: get_mfcc_features(
+            row['chunk_start'], 
+            row['chunk_end'],
+            row['end'] - row['start'],
+            row['audio_file_name']
+        ), 
+        axis=1
+    )
 
     chunks_per_label = balanced_df.groupby("label").size()
     chunks_per_label.to_csv("./data/data_quality/chunks_per_label.csv")
@@ -60,4 +106,4 @@ if __name__ == "__main__":
         json.dump(chunk_data_quality, f, indent=4)
 
     # Save balanced dataset
-    balanced_df.to_csv("./data/balanced_data.h5", index=False)
+    balanced_df.to_hdf("./data/balanced_data.h5", key='data', index=False)

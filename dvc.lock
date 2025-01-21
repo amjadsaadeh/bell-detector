@@ -9,13 +9,13 @@ stages:
       size: 152703
     - path: src/convert_labeled_data.py
       hash: md5
-      md5: 43802dceb68b8ba1229ab6557ac57b61
-      size: 1586
+      md5: 9ac03685ff26e95717642b3cb0e15f00
+      size: 1791
     outs:
     - path: data/annotation_per_row_data.csv
       hash: md5
-      md5: f9a65edaa7ac71df1f01c39549250402
-      size: 78085
+      md5: 231ed4a0b0334c36c4174ff8c6ef75de
+      size: 100890
   fetch_labeled_data:
     cmd: ./src/fetch_data.sh
     deps:
@@ -35,12 +35,12 @@ stages:
     deps:
     - path: data/annotation_per_row_data.csv
       hash: md5
-      md5: f9a65edaa7ac71df1f01c39549250402
-      size: 78085
+      md5: 231ed4a0b0334c36c4174ff8c6ef75de
+      size: 100890
     - path: src/download_audio.py
       hash: md5
-      md5: 33a09001ae591dfd86b1e35b6207d557
-      size: 1382
+      md5: e30a5245b41ca67141206a1dab1b723c
+      size: 1396
     outs:
     - path: data/audio
       hash: md5
@@ -52,8 +52,8 @@ stages:
     deps:
     - path: data/annotation_per_row_data.csv
       hash: md5
-      md5: f9a65edaa7ac71df1f01c39549250402
-      size: 78085
+      md5: 231ed4a0b0334c36c4174ff8c6ef75de
+      size: 100890
     - path: src/extract_data_quality.py
       hash: md5
       md5: 00b870221932606f650f99d03d300be0
@@ -111,31 +111,28 @@ stages:
       md5: 6beca6e665ebceb8f6e1380bea7262d2.dir
       size: 291748336
       nfiles: 644
-    - path: data/balanced_data.csv
-      hash: md5
-      md5: 7f431ecef78783885462ab82a0a0c919
-      size: 474938
     - path: src/extract_mfcc_features.py
       hash: md5
-      md5: 7425ab819e5a68ba240f6909113fede2
-      size: 1788
+      md5: 6c026247c2c7b372434361813303efc6
+      size: 1988
     params:
       params.yaml:
         feature_extraction:
           n_mfcc: 13
           n_fft: 512
     outs:
-    - path: ./data/mffc_data.h5
+    - path: data/mfcc_data/
       hash: md5
-      md5: c759c50768d13b8721d50baa68e8c4ff
-      size: 4297976
+      md5: 27098f9d0968a88011f99e629412b1db.dir
+      size: 14922816
+      nfiles: 644
   train_model:
     cmd: python src/train_xgboost.py
     deps:
-    - path: data/mffc_data.h5
+    - path: data/balanced_data.h5
       hash: md5
-      md5: c759c50768d13b8721d50baa68e8c4ff
-      size: 4297976
+      md5: 52ee8d31dc4640f47a64adbe55141742
+      size: 1530824
     - path: src/train_xgboost.py
       hash: md5
       md5: b08717ecab8401bd69bb4d796c5c89b7
@@ -152,3 +149,24 @@ stages:
       hash: md5
       md5: bbe04466a26d05534ebf70d402768673
       size: 25120
+  draw_data:
+    cmd: python src/draw_data.py
+    deps:
+    - path: data/annotation_per_row_data.csv
+      hash: md5
+      md5: 231ed4a0b0334c36c4174ff8c6ef75de
+      size: 100890
+    - path: data/mfcc_data/
+      hash: md5
+      md5: 27098f9d0968a88011f99e629412b1db.dir
+      size: 14922816
+      nfiles: 644
+    - path: src/draw_data.py
+      hash: md5
+      md5: 56acb09759631145ddfa585cc172dd64
+      size: 3602
+    outs:
+    - path: data/balanced_data.h5
+      hash: md5
+      md5: 4d2d27f6ed150d4492c90769627e906d
+      size: 5265096

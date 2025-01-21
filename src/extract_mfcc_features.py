@@ -13,17 +13,15 @@ from multiprocessing import Pool
 AUDIO_DATA_PATH = Path("./data/audio")
 
 
-def extract_mffc_features(
+def extract_mfcc_features(
     file_path: Path | str,
-    start: int,
-    end: int,
     n_mfcc: int = 25,
     n_fft=2048,
 ) -> np.ndarray:
     # Extract MFCC features
     audio = AudioSegment.from_wav(file_path)
     info = mediainfo(file_path)
-    audio_segment = np.array(audio[start:end].get_array_of_samples(), dtype=np.float32)
+    audio_segment = np.array(audio.get_array_of_samples(), dtype=np.float32)
     mfccs = librosa.feature.mfcc(
         y=audio_segment, sr=int(info["sample_rate"]), n_mfcc=n_mfcc, n_fft=n_fft
     )
@@ -32,10 +30,8 @@ def extract_mffc_features(
 
     
 def process_single_file(audio_file, output_path, params):
-    mfccs = extract_mffc_features(
+    mfccs = extract_mfcc_features(
         audio_file,
-        0,
-        -1,  # Process entire file
         params["feature_extraction"]["n_mfcc"],
         params["feature_extraction"]["n_fft"]
     )
@@ -53,6 +49,8 @@ def process_audio_data(
     # Get list of all audio files first
     audio_files = list(audio_data)
 
+    output_path.mkdir(parents=True, exist_ok=True)
+
     process_single_file_partial = functools.partial(
         process_single_file, output_path=output_path, params=params
     )
@@ -60,7 +58,7 @@ def process_audio_data(
     # Use multiprocessing with tqdm progress bar
     with Pool() as pool:
         list(tqdm.tqdm(
-            pool.map(process_single_file_partial, audio_files),
+            pool.imap(process_single_file_partial, audio_files),
             total=len(audio_files),
             desc="Extracting MFCC features"
         ))
@@ -70,5 +68,5 @@ if __name__ == "__main__":
         params = yaml.safe_load(file)
 
     process_audio_data(
-        params, AUDIO_DATA_PATH, Path("./data/mffc_data")
+        params, AUDIO_DATA_PATH, Path("./data/mfcc_data")
     )

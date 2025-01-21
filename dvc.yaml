@@ -36,14 +36,14 @@ stages:
     params:
     - feature_extraction
     outs:
-    - ./data/mffc_data
+    - data/mfcc_data/
 
   draw_data:
     cmd: python src/draw_data.py
     deps:
     - data/annotation_per_row_data.csv
-    - data/mffc_data
-    - src/balance_dataset.py
+    - data/mfcc_data/
+    - src/draw_data.py
     outs:
     - data/balanced_data.h5
 

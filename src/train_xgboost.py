@@ -31,7 +31,7 @@ def main():
     model_params = params["model"]
 
     # Load data
-    df = pd.read_hdf("./data/mffc_data.h5", key="data")
+    df = pd.read_hdf("./data/balanced_data.h5", key="data")
     X, y, le = prepare_data(df)
 
     # Split data
