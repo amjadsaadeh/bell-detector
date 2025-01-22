@@ -7,13 +7,17 @@ import pandas as pd
 import yaml
 import numpy as np
 from pathlib import Path
+from pydub.utils import mediainfo
 from dataqualityutils import get_data_quality_metrics
+from tqdm import tqdm
+from pandarallel import pandarallel
 
 
 MFCC_FEATURES_FILE_BASE = Path('./data/mfcc_data')
+AUDIO_FILE_BASE = Path('./data/audio')
 SAMPLING_RATE = 16000
 
-def get_mfcc_features(start: int,  end: int, duration: int, audio_file_name: str) -> np.ndarray:
+def get_mfcc_features(start: int,  end: int, audio_file_name: str) -> np.ndarray:
     """Reads out the MFCC features from the file and cut them according to start and end.
 
     Args:
@@ -29,20 +33,21 @@ def get_mfcc_features(start: int,  end: int, duration: int, audio_file_name: str
     mfcc_file_path = MFCC_FEATURES_FILE_BASE / audio_file_name.replace('.wav', '.npy')
     mfccs = np.load(mfcc_file_path)
     
+    info = mediainfo(AUDIO_FILE_BASE / audio_file_name)
     # Calculate the start and end sample
-    mel_coeffs_per_scond = mfccs.shape[1] / duration
+    mel_coeffs_per_second = mfccs.shape[1] / float(info['duration'])
 
-    start_sample = int(mel_coeffs_per_scond * (start / 1000))
-    end_sample = int(mel_coeffs_per_scond * (end / 1000))
-
-    print(start_sample, end_sample, mfccs.shape, start/1000, end/1000)
+    start_sample = int((mel_coeffs_per_second * start) / 1000)
+    chunk_size = int(mel_coeffs_per_second * (end - start) / 1000)
+    end_sample = start_sample + chunk_size # This way the shape of the slice it more reliably the same every time
 
     res = mfccs[:, start_sample:end_sample]
-    print(res.shape)
 
     return res
 
 if __name__ == "__main__":
+    tqdm.pandas()
+    pandarallel.initialize(progress_bar=True)
 
     with open("params.yaml", "r") as file:
         params = yaml.safe_load(file)
@@ -88,11 +93,10 @@ if __name__ == "__main__":
     sample_rate = 16000
     n_fft = params["feature_extraction"]["n_fft"]
     # Add MFCC features column
-    balanced_df['mfcc_features'] = balanced_df.apply(
+    balanced_df['mfcc_features'] = balanced_df.parallel_apply(
         lambda row: get_mfcc_features(
             row['chunk_start'], 
             row['chunk_end'],
-            row['end'] - row['start'],
             row['audio_file_name']
         ), 
         axis=1
