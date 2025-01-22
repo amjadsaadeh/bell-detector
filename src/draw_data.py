@@ -17,7 +17,7 @@ MFCC_FEATURES_FILE_BASE = Path('./data/mfcc_data')
 AUDIO_FILE_BASE = Path('./data/audio')
 SAMPLING_RATE = 16000
 
-def get_mfcc_features(start: int,  end: int, audio_file_name: str) -> np.ndarray:
+def get_mfcc_features(start: int,  end: int, audio_file_name: str, audio_file_duration: int) -> np.ndarray:
     """Reads out the MFCC features from the file and cut them according to start and end.
 
     Args:
@@ -33,9 +33,8 @@ def get_mfcc_features(start: int,  end: int, audio_file_name: str) -> np.ndarray
     mfcc_file_path = MFCC_FEATURES_FILE_BASE / audio_file_name.replace('.wav', '.npy')
     mfccs = np.load(mfcc_file_path)
     
-    info = mediainfo(AUDIO_FILE_BASE / audio_file_name)
     # Calculate the start and end sample
-    mel_coeffs_per_second = mfccs.shape[1] / float(info['duration'])
+    mel_coeffs_per_second = mfccs.shape[1] / float(audio_file_duration)
 
     start_sample = int((mel_coeffs_per_second * start) / 1000)
     chunk_size = int(mel_coeffs_per_second * (end - start) / 1000)
@@ -46,20 +45,21 @@ def get_mfcc_features(start: int,  end: int, audio_file_name: str) -> np.ndarray
     return res
 
 if __name__ == "__main__":
+    
     tqdm.pandas()
     pandarallel.initialize(progress_bar=True)
 
     with open("params.yaml", "r") as file:
         params = yaml.safe_load(file)
 
-    # Read the dataset
-    df = pd.read_csv("./data/annotation_per_row_data.csv")
+    annotated_data = pd.read_csv("./data/annotation_per_row_data.csv")
+
+    # Preload duration, so we don't have to read the file for each chunk
+    annotated_data["audio_file_duration"] = annotated_data["audio_file_name"].parallel_apply(lambda x: mediainfo(AUDIO_FILE_BASE / x)["duration"])
 
     # Cut in chunks
     chunk_size = params["chunk_size"]
     chunk_overlap = params["chunk_overlap"]
-
-    annotated_data = pd.read_csv("./data/annotation_per_row_data.csv")
 
     # Create chunks using list comprehension instead of iterative append
     chunks = [
@@ -97,7 +97,8 @@ if __name__ == "__main__":
         lambda row: get_mfcc_features(
             row['chunk_start'], 
             row['chunk_end'],
-            row['audio_file_name']
+            row['audio_file_name'],
+            row['audio_file_duration']
         ), 
         axis=1
     )
