@@ -3,16 +3,20 @@ import wave
 import numpy as np
 import collections
 import datetime
-import time
 import argparse
 import os
 from pathlib import Path
 import xgboost as xgb
 import librosa
+import yaml
+
+
+with open("params.yaml", "r") as file:
+    params = yaml.safe_load(file)
 
 # Modified parameters for Pi Zero W
 RATE = 16000
-WINDOW_SIZE = 0.1
+WINDOW_SIZE = params['chunk_size'] / 1000 # in s
 CHANNELS = 1
 FORMAT = pyaudio.paInt16  # Use 16-bit instead of float32 to reduce memory
 CHUNK = int(RATE * WINDOW_SIZE)
